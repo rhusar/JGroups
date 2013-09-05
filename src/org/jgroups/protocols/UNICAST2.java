@@ -967,7 +967,7 @@ public class UNICAST2 extends Protocol implements AgeOutCache.Handler<Address> {
     }
 
     protected void sendAck(Address dest, long seqno, short conn_id) {
-        Message msg=new Message(dest).setFlag(Message.OOB).putHeader(this.id, Unicast2Header.createAckHeader(seqno, conn_id));
+        Message msg=new Message(dest).src(local_addr).setFlag(Message.OOB).putHeader(this.id, Unicast2Header.createAckHeader(seqno, conn_id));
         if(log.isTraceEnabled())
             log.trace(local_addr + " --> ACK(" + dest + "," + seqno + " [conn_id=" + conn_id + "])");
         down_prot.down(new Event(Event.MSG, msg));
