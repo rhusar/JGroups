@@ -26,7 +26,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -104,7 +108,14 @@ public class XMLSchemaGenerator {
         for(String suffix: suffixes) {
             String package_name=PROT_PACKAGE + (suffix == null || suffix.isEmpty()? "" : "." + suffix);
             Set<Class<?>> classes=getClasses(Protocol.class, package_name);
-            for (Class<?> clazz : classes)
+            List<Class<?>> sortedClasses = new LinkedList<>(classes);
+            Collections.sort(sortedClasses, new Comparator<Class<?>>() {
+                @Override
+                public int compare(Class<?> o1, Class<?> o2) {
+                    return o1.getCanonicalName().compareTo(o2.getCanonicalName());
+                }
+            });
+            for (Class<?> clazz : sortedClasses)
                 classToXML(xmldoc, parent, clazz, package_name);
         }
     }
