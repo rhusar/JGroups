@@ -29,8 +29,8 @@ import java.util.function.Supplier;
  */
 public class RequestCorrelator {
 
-    /** The protocol layer to use to pass up/down messages. Can be either a Protocol or a Transport */
-    protected Protocol                               transport;
+    /** The channel to use to pass up/down messages. */
+    protected JChannel                               channel;
 
     /** The table of pending requests (keys=Long (request IDs), values=<tt>RequestEntry</tt>) */
     protected final ConcurrentMap<Long,Request>      requests=Util.createConcurrentMap();
@@ -57,7 +57,7 @@ public class RequestCorrelator {
     /** Whether or not to use async dispatcher */
     protected boolean                                async_dispatching;
 
-    // send exceptions back wrapped in an {@link InvocationTargetException}, or not
+    /** Whether to send exceptions back wrapped in an {@link InvocationTargetException}, or not */
     protected boolean                                wrap_exceptions=false;
 
     protected final MyProbeHandler                   probe_handler=new MyProbeHandler();
@@ -77,22 +77,55 @@ public class RequestCorrelator {
      * @param transport Used to send/pass up requests.
      *
      * @param handler Request handler. Method {@code handle(Message)} will be called when a request is received.
+     * @deprecated Replaced with {@link RequestCorrelator#RequestCorrelator(short, JChannel, RequestHandler)}.
      */
+    @Deprecated
     public RequestCorrelator(short corr_id, Protocol transport, RequestHandler handler, Address local_addr) {
         this.corr_id=corr_id;
-        this.transport  = transport;
+        this.channel = transport != null ? transport.getProtocolStack().getChannel() : null;
         this.local_addr = local_addr;
         request_handler = handler;
         start();
     }
 
+    /**
+     * @deprecated Replaced with {@link RequestCorrelator#RequestCorrelator(JChannel, RequestHandler)}.
+     */
+    @Deprecated
     public RequestCorrelator(Protocol transport, RequestHandler handler, Address local_addr) {
-        this.transport  = transport;
+        this.channel = transport != null ? transport.getProtocolStack().getChannel() : null;
         this.local_addr = local_addr;
         request_handler = handler;
         start();
     }
 
+    /**
+     * Constructor. Uses channel to send messages. If {@code request_handler} is not null, all incoming requests will be
+     * dispatched to it (via {@code handle(Message)}).
+     *
+     * @param corr_id Used to differentiate between different {@link RequestCorrelator}s (e.g. in different protocol layers).
+     * Has to be unique if multiple request correlators are used.
+     * @param channel Channel used to send/pass up requests.
+     * @param request_handler Request handler. Method {@code handle(Message)} will be called when a request is received.
+     */
+    public RequestCorrelator(short corr_id, JChannel channel, RequestHandler request_handler) {
+        this.corr_id = corr_id;
+        this.channel = channel;
+        this.local_addr = channel.getAddress();
+        this.request_handler = request_handler;
+        start();
+    }
+
+    /**
+     * Constructor. Uses channel to send messages. If {@code request_handler} is not null, all incoming requests will be
+     * dispatched to it (via {@code handle(Message)}).
+     *
+     * @param channel Channel used to send/pass up requests.
+     * @param request_handler Request handler. Method {@code handle(Message)} will be called when a request is received.
+     */
+    public RequestCorrelator(JChannel channel, RequestHandler request_handler) {
+        this(ClassConfigurator.getProtocolId(RequestCorrelator.class), channel, request_handler);
+    }
 
     public void setRequestHandler(RequestHandler handler) {
         request_handler=handler;
@@ -119,13 +152,13 @@ public class RequestCorrelator {
      *            {@code suspect()} will be invoked when a message has been received or a member is suspected.
      */
     public void sendRequest(Collection<Address> dest_mbrs, Buffer data, Request req, RequestOptions opts) throws Exception {
-        if(transport == null) {
+        if(channel == null) {
             log.warn("transport is not available !");
             return;
         }
 
         // i.   Create the request correlator header and add it to the msg
-        // ii.  If a reply is expected (coll != null), add a coresponding entry in the pending requests table
+        // ii.  If a reply is expected (coll != null), add a corresponding entry in the pending requests table
         Header hdr=opts.hasExclusionList()? new MultiDestinationHeader(Header.REQ, 0, this.corr_id, opts.exclusionList())
           : new Header(Header.REQ, 0, this.corr_id);
 
@@ -153,7 +186,7 @@ public class RequestCorrelator {
 
         if(opts.anycasting()) {
             if(opts.useAnycastAddresses()) {
-                transport.down(msg.dest(new AnycastAddress(dest_mbrs)));
+                channel.down(msg.dest(new AnycastAddress(dest_mbrs)));
             }
             else {
                 boolean first=true;
@@ -162,17 +195,17 @@ public class RequestCorrelator {
                     first=false;
                     if(!mbr.equals(local_addr) && copy.isTransientFlagSet(Message.TransientFlag.DONT_LOOPBACK))
                         copy.clearTransientFlag(Message.TransientFlag.DONT_LOOPBACK);
-                    transport.down(copy);
+                    channel.down(copy);
                 }
             }
         }
         else
-            transport.down(msg);
+            channel.down(msg);
     }
 
     /** Sends a request to a single destination */
     public void sendUnicastRequest(Address dest, Buffer data, Request req, RequestOptions opts) throws Exception {
-        if(transport == null) {
+        if(channel == null) {
             if(log.isWarnEnabled()) log.warn("transport is not available !");
             return;
         }
@@ -195,7 +228,7 @@ public class RequestCorrelator {
         }
         else // async RPC
             rpc_stats.add(RpcStats.Type.UNICAST, dest, false, 0);
-        transport.down(msg);
+        channel.down(msg);
     }
 
 
@@ -445,7 +478,7 @@ public class RequestCorrelator {
         rsp.putHeader(corr_id, rsp_hdr);
         if(log.isTraceEnabled())
             log.trace("sending rsp for %d to %s", req_id, rsp.getDest());
-        transport.down(rsp);
+        channel.down(rsp);
     }
 
     protected static Buffer replyToBuffer(Object obj, Marshaller marshaller) throws Exception {

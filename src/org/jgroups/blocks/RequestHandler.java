@@ -10,7 +10,7 @@ public interface RequestHandler {
     /**
      * Processes a request <em>synchronously</em>, ie. on the thread invoking this handler
      * @param msg the message containing the request
-     * @return the object, rceeived as result, or null (void method)
+     * @return the object, received as result, or null (void method)
      */
     Object handle(Message msg) throws Exception;
 
