@@ -157,18 +157,19 @@ public class SSL_KEY_EXCHANGE extends KeyExchange {
                 secret_key_algorithm=sym_alg;
             }
         }
-        key_store=KeyStore.getInstance(keystore_type != null? keystore_type : KeyStore.getDefaultType());
+        if (key_store == null) {
+            key_store = KeyStore.getInstance(keystore_type != null ? keystore_type : KeyStore.getDefaultType());
 
-        InputStream input=null;
-        try {
-            input=new FileInputStream(keystore_name);
+            InputStream input;
+            try {
+                input = new FileInputStream(keystore_name);
+            } catch (FileNotFoundException not_found) {
+                input = Util.getResourceAsStream(keystore_name, getClass());
+            }
+            if (input == null)
+                throw new FileNotFoundException(keystore_name);
+            key_store.load(input, keystore_password.toCharArray());
         }
-        catch(FileNotFoundException not_found) {
-            input=Util.getResourceAsStream(keystore_name, getClass());
-        }
-        if(input == null)
-            throw new FileNotFoundException(keystore_name);
-        key_store.load(input, keystore_password.toCharArray());
         if(session_verifier == null && session_verifier_class != null) {
             Class<? extends SessionVerifier> verifier_class=Util.loadClass(session_verifier_class, getClass());
             session_verifier=verifier_class.getDeclaredConstructor().newInstance();
@@ -320,7 +321,7 @@ public class SSL_KEY_EXCHANGE extends KeyExchange {
         SSLContext ctx=getContext();
         SSLServerSocketFactory sslServerSocketFactory=ctx.getServerSocketFactory();
 
-        SSLServerSocket sslServerSocket=null;
+        SSLServerSocket sslServerSocket;
         for(int i=0; i < port_range; i++) {
             try {
                 sslServerSocket=(SSLServerSocket)sslServerSocketFactory.createServerSocket(port + i, 50, bind_addr);
@@ -341,7 +342,7 @@ public class SSL_KEY_EXCHANGE extends KeyExchange {
             return createSocketTo((IpAddress)target, sslSocketFactory);
 
         IpAddress dest=(IpAddress)down_prot.down(new Event(Event.GET_PHYSICAL_ADDRESS, target));
-        SSLSocket sock=null;
+        SSLSocket sock;
         for(int i=0; i < port_range; i++) {
             try {
                 sock=(SSLSocket)sslSocketFactory.createSocket(dest.getIpAddress(), port+i);
@@ -400,7 +401,6 @@ public class SSL_KEY_EXCHANGE extends KeyExchange {
         KeyManager[] km=keyManagerFactory.getKeyManagers();
 
         // Create trust manager
-        // TrustManagerFactory trustManagerFactory=TrustManagerFactory.getInstance("SunX509");
         TrustManagerFactory trustManagerFactory=TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(key_store);
         TrustManager[] tm=trustManagerFactory.getTrustManagers();
@@ -410,22 +410,5 @@ public class SSL_KEY_EXCHANGE extends KeyExchange {
         sslContext.init(km, tm, null);
         return this.ssl_ctx=sslContext;
     }
-
-
-    protected static String print16(PublicKey pub_key) {
-        // use SHA256 to create a hash of secret_key and only then truncate it to secret_key_length
-        MessageDigest digest=null;
-        try {
-            digest=MessageDigest.getInstance("SHA-256");
-            digest.update(pub_key.getEncoded());
-            return Util.byteArrayToHexString(digest.digest(), 0, 16);
-        }
-        catch(NoSuchAlgorithmException e) {
-            return e.toString();
-        }
-    }
-
-
-
 }
 
