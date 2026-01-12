@@ -20,7 +20,7 @@ import org.jgroups.protocols.RED;
 import org.jgroups.protocols.TCP;
 import org.jgroups.protocols.TCPPING;
 import org.jgroups.protocols.UNICAST4;
-import org.jgroups.protocols.VERIFY_SUSPECT2;
+// import org.jgroups.protocols.VERIFY_SUSPECT2;
 import org.jgroups.protocols.pbcast.GMS;
 import org.jgroups.util.Util;
 import org.testng.annotations.AfterMethod;
@@ -29,6 +29,10 @@ import org.testng.annotations.Test;
 
 /**
  * Tests {@link BasicTCP#enableSuspectEvents(boolean)} to reproduce https://issues.redhat.com/browse/WFLY-21236
+ * <p>
+ * NOTE: VERIFY_SUSPECT2 is temporarily disabled in this test to see if suspect events are being generated.
+ * Without VERIFY_SUSPECT2, suspect events will immediately cause node removal.
+ * </p>
  * Run with: mvn clean test -Dtest=EnableSuspectEventsTest
  *
  * @author Radoslav Husar
@@ -47,13 +51,13 @@ public class EnableSuspectEventsTest {
     @BeforeMethod
     protected void setup() throws Exception {
         // Enable IPv6
-        System.setProperty("java.net.preferIPv6Addresses", "true");
+//        System.setProperty("java.net.preferIPv6Addresses", "true");
 
         channels = new JChannel[NUM_NODES];
         monitors = new TopologyMonitor[NUM_NODES];
 
         // Build the initial hosts list for TCPPING using IPv6
-        InetAddress ipv6Localhost = InetAddress.getByName("::1");  // IPv6 localhost
+        InetAddress ipv6Localhost = InetAddress.getByName("localhost");  // IPv6 localhost
         List<InetSocketAddress> initialHosts = new ArrayList<>();
         for (int i = 0; i < NUM_NODES; i++) {
             initialHosts.add(new InetSocketAddress(ipv6Localhost, BASE_PORT + i));
@@ -191,7 +195,9 @@ public class EnableSuspectEventsTest {
 
         TCPPING tcpping = new TCPPING()
                 .setInitialHosts(initialHosts)
-                .setPortRange(0);
+                .setPortRange(0)
+                .numDiscoveryRuns(3)
+                ;
 
         MERGE3 merge3 = new MERGE3()
                 .setMinInterval(10000)  // 10s
@@ -201,8 +207,9 @@ public class EnableSuspectEventsTest {
                 .setInterval(15000)  // 15s
                 .setTimeout(60000);  // 60s
 
-        VERIFY_SUSPECT2 verifySuspect2 = new VERIFY_SUSPECT2()
-                .setTimeout(1000);  // 1s
+        // VERIFY_SUSPECT2 temporarily disabled to see if suspect events are being generated
+        // VERIFY_SUSPECT2 verifySuspect2 = new VERIFY_SUSPECT2()
+        //         .setTimeout(1000);  // 1s
 
         NAKACK4 nakack4 = (NAKACK4) new NAKACK4()
                 .setXmitInterval(100);  // 100ms
@@ -216,7 +223,8 @@ public class EnableSuspectEventsTest {
         FRAG4 frag4 = new FRAG4()
                 .setFragSize(60000);  // 60k
 
-        return new JChannel(tcp, red, tcpping, merge3, fdAll3, verifySuspect2, nakack4, unicast4, gms, frag4).name(name);
+        // Without VERIFY_SUSPECT2, suspect events will immediately cause removal
+        return new JChannel(tcp, red, tcpping, merge3, fdAll3, nakack4, unicast4, gms, frag4).name(name);
     }
 
     /**
