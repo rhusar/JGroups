@@ -8,11 +8,11 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-
 /**
  * This is the role of a regular member, which has successfully joined the cluster, but is not the coordinator
  */
 public class ParticipantGmsImpl extends ServerGmsImpl {
+    // JGRP-2966 Given the access pattern in this class *all* accesses must be synchronized - thus a simple LinkedHashSet is sufficient
     private final Collection<Address> suspected_mbrs=new LinkedHashSet<>();
 
     public ParticipantGmsImpl(GMS g) {
@@ -22,7 +22,9 @@ public class ParticipantGmsImpl extends ServerGmsImpl {
 
     public void init() throws Exception {
         super.init();
-        suspected_mbrs.clear();
+        synchronized(suspected_mbrs) {
+            suspected_mbrs.clear();
+        }
     }
 
     @Override
@@ -72,41 +74,48 @@ public class ParticipantGmsImpl extends ServerGmsImpl {
     /** Removes previously suspected member from list of currently suspected members */
     public void unsuspect(Address mbr) {
         if(mbr != null)
-            suspected_mbrs.remove(mbr);
+            synchronized (suspected_mbrs) {
+                suspected_mbrs.remove(mbr);
+            }
     }
 
 
     public void handleMembershipChange(Collection<Request> requests) {
         Collection<Address> leaving_mbrs=new LinkedHashSet<>(requests.size());
-        requests.forEach(r -> {
-            if(r.type == Request.SUSPECT)
-                suspected_mbrs.add(r.mbr);
-            else if(r.type == Request.LEAVE)
-                leaving_mbrs.add(r.mbr);
-        });
 
-        if(suspected_mbrs.isEmpty() && leaving_mbrs.isEmpty())
-            return;
-
-        if(wouldIBeCoordinator(leaving_mbrs, suspected_mbrs)) {
-            log.debug("%s: members are %s, coord=%s: I'm the new coordinator", gms.getAddress(), gms.members, gms.getAddress());
-            gms.becomeCoordinator();
-            Collection<Request> leavingOrSuspectedMembers=new LinkedHashSet<>();
-            leaving_mbrs.forEach(mbr -> leavingOrSuspectedMembers.add(new Request(Request.LEAVE, mbr)));
-            suspected_mbrs.forEach(mbr -> {
-                leavingOrSuspectedMembers.add(new Request(Request.SUSPECT, mbr));
-                gms.ack_collector.suspect(mbr);
+        synchronized(suspected_mbrs) {
+            requests.forEach(r -> {
+                if(r.type == Request.SUSPECT)
+                    suspected_mbrs.add(r.mbr);
+                else if(r.type == Request.LEAVE)
+                    leaving_mbrs.add(r.mbr);
             });
-            suspected_mbrs.clear();
-            if(gms.isLeaving())
-                leavingOrSuspectedMembers.add(new Request(Request.COORD_LEAVE));
-            gms.getViewHandler().add(leavingOrSuspectedMembers);
+
+            if(suspected_mbrs.isEmpty() && leaving_mbrs.isEmpty())
+                return;
+
+            if(wouldIBeCoordinator(leaving_mbrs, suspected_mbrs)) {
+                log.debug("%s: members are %s, coord=%s: I'm the new coordinator", gms.getAddress(), gms.members, gms.getAddress());
+                gms.becomeCoordinator();
+                Collection<Request> leavingOrSuspectedMembers=new LinkedHashSet<>();
+                leaving_mbrs.forEach(mbr -> leavingOrSuspectedMembers.add(new Request(Request.LEAVE, mbr)));
+                suspected_mbrs.forEach(mbr -> {
+                    leavingOrSuspectedMembers.add(new Request(Request.SUSPECT, mbr));
+                    gms.ack_collector.suspect(mbr);
+                });
+                suspected_mbrs.clear();
+                if(gms.isLeaving())
+                    leavingOrSuspectedMembers.add(new Request(Request.COORD_LEAVE));
+                gms.getViewHandler().add(leavingOrSuspectedMembers);
+            }
         }
     }
 
 
     public void handleViewChange(View view, Digest digest) {
-        suspected_mbrs.clear();
+        synchronized(suspected_mbrs) {
+            suspected_mbrs.clear();
+        }
         super.handleViewChange(view, digest);
     }
 
