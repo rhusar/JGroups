@@ -23,7 +23,7 @@ import org.testng.annotations.Test;
  *
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class MessageBundlingTest extends ChannelTestBase {
     private JChannel               a, b;
     private final Promise<Boolean> promise=new Promise<>();

@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT)
+@Test(groups = Global.STACK_DEPENDENT)
 public class RpcDispatcherAnycastTest extends ChannelTestBase {
     protected RpcDispatcher disp, disp2, disp3;
     protected JChannel      a, b, c;

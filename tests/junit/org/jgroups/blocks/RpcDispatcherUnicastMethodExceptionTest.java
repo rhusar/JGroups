@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class RpcDispatcherUnicastMethodExceptionTest extends ChannelTestBase {
     RpcDispatcher disp;
     JChannel channel;

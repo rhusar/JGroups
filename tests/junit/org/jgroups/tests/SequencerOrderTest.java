@@ -30,7 +30,7 @@ import java.util.stream.Stream;
  * receiver delivered all messages in the same order.
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_INDEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_INDEPENDENT, singleThreaded = true)
 public class SequencerOrderTest {
     private JChannel              a, b, c;
     private MyReceiver            r1, r2, r3;

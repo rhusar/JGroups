@@ -1,9 +1,9 @@
-
 package org.jgroups.demos;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -40,9 +40,9 @@ public final class KeyStoreGenerator {
 		throw new InstantiationError( "Must not instantiate this class" );
 	}
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         int i=0;
-        String arg=null;
+        String arg;
 
         while(i < args.length && args[i].startsWith("-")) {
             arg=args[i++];
@@ -89,7 +89,7 @@ public final class KeyStoreGenerator {
         System.out.println("Finished keystore creation");
     }
 
-    protected static void help() {
+    private static void help() {
         System.out.println("KeyStoreGenerator [-help] [--alg algorithm] [--size size] [--storeName name] " +
                              "[--storeType type (e.g. JKS)] [--storePass password] [--alias alias]");
     }

@@ -63,7 +63,6 @@ public class LargeMergeTest {
         System.out.printf("-- stopping the channels took %s\n", Util.printTime(time, TimeUnit.NANOSECONDS));
     }
 
-
     public void testClusterFormationAfterMerge() throws TimeoutException {
         System.out.println("\nEnabling message traffic between members to start the merge");
         for(JChannel ch: channels) {

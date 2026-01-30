@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Verifies that messages sent by P are delivered in the order in which P sent them
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class FifoOrderTest extends ChannelTestBase {    
     JChannel       a, b, c;
     CountDownLatch latch;

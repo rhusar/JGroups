@@ -10,7 +10,7 @@ import java.util.concurrent.CyclicBarrier;
 /**
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class ConcurrentCloseTest extends ChannelTestBase {
     JChannel a, b;
 

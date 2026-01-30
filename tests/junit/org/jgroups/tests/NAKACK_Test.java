@@ -26,7 +26,7 @@ import static org.jgroups.stack.ProtocolStack.Position.BELOW;
  * Ref: https://issues.redhat.com/browse/JGRP-379
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class NAKACK_Test extends ChannelTestBase {
     protected JChannel a, b, c;
 

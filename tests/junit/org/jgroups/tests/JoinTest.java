@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class JoinTest extends ChannelTestBase {
     protected JChannel a, b;
 

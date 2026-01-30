@@ -1,6 +1,7 @@
 package org.jgroups.tests;
 
 import org.jgroups.Address;
+import org.jgroups.Global;
 import org.jgroups.JChannel;
 import org.jgroups.protocols.*;
 import org.jgroups.protocols.pbcast.GMS;
@@ -19,7 +20,7 @@ import java.net.InetAddress;
  * @author Bela Ban
  * @since  3.6.4
  */
-@Test(singleThreaded=true)
+@Test(groups = Global.FUNCTIONAL, singleThreaded = true)
 public class FalseSuspicionTest {
     protected static final int    NUM=5;
     protected static final Method suspect_method;

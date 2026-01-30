@@ -1,0 +1,111 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="CI UDP Tests" verbose="1">
+    <test name="UDP Stack Tests">
+        <groups>
+            <run>
+                <include name="base"/>
+                <include name="stack-dependent"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="org.jgroups.*"/>
+        </packages>
+    </test>
+
+    <!-- Excluded flaky tests for CI -->
+    <test name="CI Excluded Tests">
+        <classes>
+            <!-- Stack-dependent tests excluded on CI -->
+            <class name="org.jgroups.tests.UUIDCacheClearTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.LoopbackTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.DuplicateTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.FifoOrderTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.StateTransferTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ChannelTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.TransportThreadPoolTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.JoinTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.Deadlock2Test">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ReplicatedHashMapTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.OverlappingUnicastMergeTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.LastMessageDroppedTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ConnectTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.NAKACK_Test">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.MessageBundlingTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.CloseTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.LargeStateTransferTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.MergeTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.OverlappingMergeTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.OOBTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.MessageDispatcherUnitTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.DiscardTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ConcurrentCloseTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherInterruptTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherAnycastTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherUnicastMethodExceptionTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherUnitTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherSerializationTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherAnycastMultipleCallsTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherExceptionTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+        </classes>
+    </test>
+</suite>

@@ -21,10 +21,8 @@ import java.util.List;
  *
  * @author John Giorgiadis
  * @author Ovidiu Feodorov <ovidiuf@users.sourceforge.net>
- * *
- * @version $Revision: 1.23 $
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class Deadlock2Test extends ChannelTestBase {
     private static final String name = "Deadlock2Test";
 

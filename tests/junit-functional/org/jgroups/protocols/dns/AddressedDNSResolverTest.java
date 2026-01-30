@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.jgroups.Address;
+import org.jgroups.Global;
 import org.jgroups.stack.IpAddress;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -41,7 +42,7 @@ public class AddressedDNSResolverTest {
       Assert.assertTrue(addresses.isEmpty());
    }
 
-   @Test
+   @Test(groups = { Global.TIME_SENSITIVE })
    public void test_parsing_srv_entries() throws Exception {
       //given
       MockDirContext mockDirContext = MockDirContext.newDefault()

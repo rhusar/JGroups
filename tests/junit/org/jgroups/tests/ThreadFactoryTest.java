@@ -22,6 +22,7 @@ public class ThreadFactoryTest {
         assert name.equals(BASE);
     }
 
+//    @Test(groups = { Global.CI_EXCLUDED })
     public void testNumbering() {
         factory=new DefaultThreadFactory(BASE, true, true);
         Thread thread=factory.newThread(new MyRunnable(), BASE);
@@ -35,6 +36,7 @@ public class ThreadFactoryTest {
         assert name.equals("base-2");
     }
 
+//    @Test(groups = { Global.CI_EXCLUDED })
     public void testPatterns() {
         factory=new DefaultThreadFactory(BASE, true, false);
         factory.setAddress(ADDR);

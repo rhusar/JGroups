@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * Tests the {@link RSVP} protocol
  * @author Bela Ban
  */
-@Test(groups=Global.FUNCTIONAL,singleThreaded=true)
+@Test(groups = Global.FUNCTIONAL, singleThreaded = true)
 public class RSVPTest {
     protected static final int     NUM=5; // number of members
     protected final JChannel[]     channels=new JChannel[NUM];
@@ -185,6 +185,7 @@ public class RSVPTest {
     }
 
     /** Tests that async RSVP tasks that are lost are removed after timeout ms */
+    @Test(groups = { Global.TIME_SENSITIVE })
     public void testAsyncLostRSVPMessages() throws Exception {
         // test with a multicast message:
         short value=(short)Math.abs((short)Util.random(10000));

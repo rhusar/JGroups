@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 /**
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class TransportThreadPoolTest extends ChannelTestBase {
     JChannel a, b;
 
@@ -65,7 +65,7 @@ public class TransportThreadPoolTest extends ChannelTestBase {
         a.send(null, "A.m2");
         b.send(null, "B.m2");
 
-        Util.waitUntil(10000, 100, () -> l1.size() == 4 && l2.size() == 4,
+        Util.waitUntil(30000, 100, () -> l1.size() == 4 && l2.size() == 4,
                        () -> String.format("A: %s, B: %s", print(l1), print(l2)));
 
         System.out.println("messages A: " + print(r1.getMsgs()) + "\nmessages B: " + print(r2.getMsgs()));

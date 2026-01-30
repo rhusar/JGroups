@@ -1,11 +1,13 @@
 package org.jgroups.blocks;
 
+import org.jgroups.Global;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.*;
 import java.util.*;
 
+@Test(groups = Global.FUNCTIONAL)
 public class CacheTest {
 
     private static final String KEY1 = "key1";

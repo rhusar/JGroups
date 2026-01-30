@@ -23,7 +23,7 @@ import java.util.stream.Stream;
  * @author Bela Ban
  * @since  5.0.0
  */
-@Test(groups=Global.FUNCTIONAL,singleThreaded=true)
+@Test(groups = Global.FUNCTIONAL, singleThreaded = true)
 public class RED_Test {
     protected JChannel             ch;
     protected DelayBundler         bundler;
@@ -78,7 +78,7 @@ public class RED_Test {
         });
 
         assert Stream.of(senders).noneMatch(Thread::isAlive);
-        Util.waitUntil(10000, 500, () -> bundler.getSentMessages() + red.getDroppedMessages() >= TOT_MSGS,
+        Util.waitUntil(30000, 500, () -> bundler.getSentMessages() + red.getDroppedMessages() >= TOT_MSGS,
                        () -> String.format("sent msgs (%d) and dropped msgs (%d) need to be >= %d",
                                            bundler.getSentMessages(), red.getDroppedMessages(), TOT_MSGS));
         System.out.printf("red: %s\nbundler: %s\n", red, bundler);

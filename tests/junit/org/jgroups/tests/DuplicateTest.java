@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentMap;
  * messages. 
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class DuplicateTest extends ChannelTestBase {
     private JChannel   a, b, c;
     protected Address  a1, a2, a3;

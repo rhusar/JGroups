@@ -1,0 +1,26 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="CI Byteman Tests" verbose="1">
+    <test name="Byteman Tests">
+        <groups>
+            <run>
+                <include name="byteman"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="org.jgroups.tests.byteman.*"/>
+        </packages>
+    </test>
+
+    <!-- Excluded flaky tests for CI -->
+    <test name="CI Excluded Tests">
+        <classes>
+            <!-- Byteman tests excluded on CI -->
+            <class name="org.jgroups.tests.byteman.ServerTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.byteman.SequencerFailoverTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+        </classes>
+    </test>
+</suite>

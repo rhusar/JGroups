@@ -1,5 +1,6 @@
 package org.jgroups.tests;
 
+import org.jgroups.Global;
 import org.jgroups.util.LazyThreadFactory;
 import org.jgroups.util.Util;
 import org.testng.annotations.Test;

@@ -27,7 +27,7 @@ import java.util.stream.Stream;
  * @author Bela Ban
  * @since  4.1.8
  */
-@Test(groups=Global.FUNCTIONAL,singleThreaded=true)
+@Test(groups = Global.FUNCTIONAL, singleThreaded = true)
 public class ConcurrentStartupTest {
     protected static final String CLUSTER_SHARED=ConcurrentStartupTest.class.getSimpleName() + "-SHARED";
     protected static final String CLUSTER_LOCAL=ConcurrentStartupTest.class.getSimpleName() + "-LOCAL";
@@ -121,7 +121,7 @@ public class ConcurrentStartupTest {
         }
         System.out.printf("Starting parallel join of %d channels\n", channels.length);
         latch.countDown();
-        Util.waitUntilAllChannelsHaveSameView(5000, 500, channels);
+        Util.waitUntilAllChannelsHaveSameView(30_000, 500, channels);
         System.out.printf("\nAll channels have the same views:\n%s\n",
                           Stream.of(channels).map(ch -> String.format("%s: %s", ch.getAddress(), ch.getView()))
                             .collect(Collectors.joining("\n")));

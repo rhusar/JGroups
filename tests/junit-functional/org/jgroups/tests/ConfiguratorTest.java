@@ -132,6 +132,7 @@ public class ConfiguratorTest {
 
 
     /** Tests that vars are substituted correctly when creating a channel programmatically (https://issues.redhat.com/browse/JGRP-1908) */
+    @Test(groups = { Global.TIME_SENSITIVE })
     public void testProgrammaticCreationAndVariableSubstitution() throws Exception {
         try {
             System.setProperty("person.name", "Bela");

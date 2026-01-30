@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Test(groups=Global.STACK_DEPENDENT, singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class RpcDispatcherAnycastMultipleCallsTest extends ChannelTestBase {
     private RpcDispatcherAnycastServerObject[] targets=null;
     static final int NUM=3;

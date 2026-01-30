@@ -436,7 +436,7 @@ public class Util {
                 break;
             Util.sleep(interval);
         }
-        assert list.size() == expected_size : "list doesn't have the expected (" + expected_size + ") elements: " + list;
+        assert list.size() == expected_size : "list doesn't have the expected (" + expected_size + ") elements: " + list.stream().limit(100) + " (truncated to first 100 elements)";
     }
 
     public static void removeFromViews(Address mbr, JChannel ... channels) {

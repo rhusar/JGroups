@@ -1,5 +1,7 @@
 package org.jgroups.tests;
 
+import static org.jgroups.util.Util.can_bind_to_mcast_addr;
+
 import org.jgroups.Global;
 import org.jgroups.annotations.Property;
 import org.jgroups.conf.ProtocolConfiguration;
@@ -8,6 +10,7 @@ import org.jgroups.stack.Configurator.InetAddressInfo;
 import org.jgroups.stack.Protocol;
 import org.jgroups.stack.ProtocolStack;
 import org.jgroups.util.Util;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -39,6 +42,8 @@ public class InetAddressChecksTest {
 	 */
 	@Test(expectedExceptions=RuntimeException.class)
 	public void testIPVersionCheckingNoConsistentVersion() throws Exception {
+		if (Boolean.getBoolean(Global.IPv4)) throw new SkipException("Skip if java.net.preferIPv4Stack=true.");
+
 		List<ProtocolConfiguration> protocol_configs = new ArrayList<>() ;
 		List<Protocol> protocols = new ArrayList<>() ;
 		

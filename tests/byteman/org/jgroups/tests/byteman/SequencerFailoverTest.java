@@ -22,7 +22,7 @@ import java.util.*;
  * (see individual tests for more detailed descriptions).
  * @author Bela Ban
  */
-@Test(groups=Global.BYTEMAN,singleThreaded=true)
+@Test(groups = Global.BYTEMAN, singleThreaded = true)
 public class SequencerFailoverTest extends BMNGRunner {
     JChannel a, b, c; // A is the coordinator
     static final String GROUP="SequencerFailoverTest";

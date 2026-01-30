@@ -42,7 +42,7 @@ import static org.jgroups.blocks.ResponseMode.GET_ALL;
  * 
  * @author Bela Ban
  */
-@Test(groups=Global.FUNCTIONAL,singleThreaded=true)
+@Test(groups = Global.FUNCTIONAL, singleThreaded = true)
 public class RpcDispatcherTest {
     protected RpcDispatcher       da, db, dc;
     protected JChannel            a, b, c;

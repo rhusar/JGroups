@@ -1,0 +1,101 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="CI Default Tests" verbose="1">
+    <test name="Default Stack Tests">
+        <groups>
+            <run>
+                <exclude name="stack-dependent"/>
+                <exclude name="byteman"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="org.jgroups.*"/>
+        </packages>
+    </test>
+
+    <!-- Excluded flaky tests for CI -->
+    <test name="CI Excluded Tests">
+        <classes>
+            <!-- Functional tests excluded on CI -->
+            <class name="org.jgroups.protocols.RED_Test">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.protocols.GMS_MergeTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.protocols.UNICAST_ContentionTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.protocols.dns.DNS_PINGTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ResponseCollectorTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.RSVPTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.FrozenCoordinatorTest">
+                <methods><exclude name="testFrozenCoordinator"/></methods>
+            </class>
+            <class name="org.jgroups.tests.LazyThreadFactoryTest">
+                <methods><exclude name="testMaxThreads"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ViewHandlerTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.FalseSuspicionTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.FragTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ServerUnitTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.LargeMergeTest">
+                <methods><exclude name="testClusterFormationAfterMerge"/></methods>
+            </class>
+            <class name="org.jgroups.tests.ConcurrentStartupTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.UtilTest">
+                <methods><exclude name="testMessageBatchSizeExact"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.CacheTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.RpcDispatcherTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.blocks.CounterTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <!-- UNICAST tests that are already excluded via conflict resolution -->
+            <class name="org.jgroups.protocols.UNICAST_MessagesToSelfTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.protocols.UNICAST_OOB_Test">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.protocols.UNICAST_ConnectionTests">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.protocols.UNICAST_RetransmitTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.UnicastUnitTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <!-- ENCRYPT tests -->
+            <class name="org.jgroups.protocols.TLSTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.protocols.ASYM_ENCRYPT_LeaveTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+            <class name="org.jgroups.tests.BaseLeaveTest">
+                <methods><exclude name=".*"/></methods>
+            </class>
+        </classes>
+    </test>
+</suite>

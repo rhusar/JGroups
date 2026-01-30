@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Tests the last message dropped problem in NAKACK (see doc/design/varia2.txt)
  * @author Bela Ban
  */
-@Test(groups=Global.STACK_DEPENDENT,singleThreaded=true)
+@Test(groups = Global.STACK_DEPENDENT, singleThreaded = true)
 public class LastMessageDroppedTest extends ChannelTestBase {
     protected JChannel a, b;
     protected static final short NAKACK2_ID, NAKACK4_ID;

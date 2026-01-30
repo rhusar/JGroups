@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 /**
  * @author Bela Ban
  */
-@Test(groups=Global.FUNCTIONAL,singleThreaded=true)
+@Test(groups = { Global.FUNCTIONAL, Global.TIME_SENSITIVE }, singleThreaded = true)
 public class RejectionPoliciesTest {
     public void testCustomPolicy() {
         BlockingQueue<Runnable> queue = new SynchronousQueue<>();

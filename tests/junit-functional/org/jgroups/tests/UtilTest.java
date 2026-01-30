@@ -27,7 +27,6 @@ import java.util.stream.LongStream;
 @Test(groups=Global.FUNCTIONAL)
 public class UtilTest {
     protected static final char decimal_sep=DecimalFormatSymbols.getInstance().getDecimalSeparator();
-    //protected static final char decimal_sep=DecimalFormatSymbols.getInstance().getDecimalSeparator();
 
     public void testShuffle() {
         Integer[] array={1,2,3,4,5};
@@ -693,7 +692,7 @@ public class UtilTest {
             return null;
         }
         catch(Throwable throwable) {
-            throwable.printStackTrace(new PrintStream(new FileOutputStream("/dev/null")));
+            throwable.printStackTrace(new PrintStream(new FileOutputStream(Util.checkForWindows() ? "nul" : "/dev/null")));
             return throwable;
         }
     }
