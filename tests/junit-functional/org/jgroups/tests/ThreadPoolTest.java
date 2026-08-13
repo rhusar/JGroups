@@ -2,6 +2,7 @@ package org.jgroups.tests;
 
 import org.jgroups.Global;
 import org.jgroups.util.ThreadPool;
+import org.jgroups.util.Util;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -100,6 +101,32 @@ public class ThreadPoolTest {
         }
         finally {
             release.countDown();
+            pool.destroy();
+        }
+    }
+
+    /**
+     * DiscardOldestPolicy drops the head of the queue and retries; as this pool hands tasks over through a
+     * SynchronousQueue, the retry is rejected again and recurses until the stack overflows
+     */
+    public void testDiscardOldestRejectionPolicyIsRefused() throws Exception {
+        try {
+            new ThreadPool().setRejectionPolicy("discardoldest");
+            assert false : "an IllegalArgumentException should have been thrown";
+        }
+        catch(IllegalArgumentException expected) {
+        }
+
+        // the policy can also be injected into the field directly, bypassing setRejectionPolicy()
+        ThreadPool pool=new ThreadPool();
+        Util.setField(Util.getField(ThreadPool.class, "rejection_policy"), pool, "discardoldest");
+        try {
+            pool.init();
+            assert false : "an IllegalArgumentException should have been thrown";
+        }
+        catch(IllegalArgumentException expected) {
+        }
+        finally {
             pool.destroy();
         }
     }

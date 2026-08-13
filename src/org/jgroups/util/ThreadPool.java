@@ -44,7 +44,9 @@ public class ThreadPool implements Lifecycle {
     protected long                keep_alive_time=30000;
 
     @Property(description="The rejection policy to be used in the thread pool (abort, discard, run, custom etc. " +
-      "See Util.parseRejectionPolicy() for details")
+      "See Util.parseRejectionPolicy() for details. Note that a policy which drops tasks silently (e.g. discard) is " +
+      "still reported as a rejection by execute(), as its caller would otherwise treat a dropped message as " +
+      "delivered; discardoldest cannot be used, as this pool has no queue whose oldest task could be dropped")
     protected String              rejection_policy="abort";
 
     @Property(description="Time (in milliseconds) during which thread-pool full messages are suppressed",type=TIME)
@@ -131,7 +133,7 @@ public class ThreadPool implements Lifecycle {
     }
 
     public ThreadPool setRejectionPolicy(String policy) {
-        RejectedExecutionHandler p=Util.parseRejectionPolicy(policy);
+        RejectedExecutionHandler p=checkRejectionPolicy(Util.parseRejectionPolicy(policy), policy);
         this.rejection_policy=policy;
         if(thread_pool instanceof ThreadPoolExecutor) // same decoration as when the pool was created
             ((ThreadPoolExecutor)thread_pool).setRejectedExecutionHandler(new ShutdownRejectedExecutionHandler(p));
@@ -200,6 +202,8 @@ public class ThreadPool implements Lifecycle {
             log=LogFactory.getLog(getClass());
         thread_pool_full_log=new SuppressLog<>(log, "ThreadPoolFull");
         if(enabled) {
+            // the policy may have been injected into the field directly, rather than via setRejectionPolicy()
+            checkRejectionPolicy(Util.parseRejectionPolicy(rejection_policy), rejection_policy);
             if(thread_factory == null)
                 thread_factory=new DefaultThreadFactory("thread-pool", true, true);
             thread_pool=ThreadCreator.createThreadPool(min_threads, max_threads, keep_alive_time,
@@ -275,6 +279,18 @@ public class ThreadPool implements Lifecycle {
 
     public String toString() {
         return thread_pool != null? thread_pool.toString() : "n/a";
+    }
+
+    /**
+     * DiscardOldestPolicy drops the head of the queue and retries the rejected task. This pool hands tasks over
+     * through a {@link SynchronousQueue}, which never has a head to drop, so the retry is rejected again, recursing
+     * until the stack overflows. Reject the policy rather than fail once the pool saturates.
+     */
+    protected static RejectedExecutionHandler checkRejectionPolicy(RejectedExecutionHandler h, String policy) {
+        if(Util.unwrapRejectionPolicy(h) instanceof ThreadPoolExecutor.DiscardOldestPolicy)
+            throw new IllegalArgumentException(String.format("rejection policy \"%s\" cannot be used with a thread " +
+                                                              "pool which has no queue", policy));
+        return h;
     }
 
     protected static ExecutorService createThreadPool(int min_threads, int max_threads, long keep_alive_time,
