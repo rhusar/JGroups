@@ -227,12 +227,29 @@ public class ThreadPool implements Lifecycle {
         return this;
     }
 
+    /**
+     * Submits a task to the pool without reporting whether it was accepted. In contrast to {@link #execute(Runnable)},
+     * a policy which drops tasks silently (e.g. discard) does so here as well: a caller which doesn't look at the
+     * outcome of a submission has no use for a rejection either.
+     */
     public void doExecute(Runnable task) {
-        thread_pool.execute(task);
+        try {
+            thread_pool.execute(task);
+        }
+        catch(ShutdownRejectedExecutionHandler.DiscardedException dropped) {
+            // the policy dropped the task on purpose; only execute() needs to hear about it
+        }
     }
 
     public Executor pool() {return thread_pool;}
 
+    /**
+     * Submits a task to the thread pool
+     * @return true if the task was accepted, false if it was rejected <em>or dropped</em>: a rejection policy such as
+     * discard drops a task without raising an exception, but a caller has to be able to tell a task which will never
+     * run from one which was accepted (e.g. {@link MaxOneThreadPerSender}, which would otherwise never deliver another
+     * message from that sender)
+     */
     public boolean execute(Runnable task) {
         // a shut-down pool drops the task silently (ShutdownRejectedExecutionHandler), so don't even submit it
         if(isShutdown())

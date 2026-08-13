@@ -5,6 +5,7 @@ import org.jgroups.util.ThreadPool;
 import org.testng.annotations.Test;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,6 +61,42 @@ public class ThreadPoolTest {
             assert pool.execute(ran::countDown) : "the task was run by the caller, but execute() returned false";
             assert ran.getCount() == 0;
             assert pool.numberOfRejectedMessages() == 0 : "rejected messages: " + pool.numberOfRejectedMessages();
+        }
+        finally {
+            release.countDown();
+            pool.destroy();
+        }
+    }
+
+    /**
+     * In contrast to execute(), doExecute() has no way of reporting a rejection to its caller, so a policy which
+     * drops tasks silently has to keep doing so there
+     */
+    public void testDoExecuteDropsSilently() throws Exception {
+        ThreadPool pool=create("discard");
+        CountDownLatch release=new CountDownLatch(1);
+        try {
+            saturate(pool, release);
+            pool.doExecute(() -> {}); // must not throw
+        }
+        finally {
+            release.countDown();
+            pool.destroy();
+        }
+    }
+
+    /** A policy which rejects rather than drops still raises an exception in doExecute() */
+    public void testDoExecuteWithAbortingPolicy() throws Exception {
+        ThreadPool pool=create("abort");
+        CountDownLatch release=new CountDownLatch(1);
+        try {
+            saturate(pool, release);
+            try {
+                pool.doExecute(() -> {});
+                assert false : "a RejectedExecutionException should have been thrown";
+            }
+            catch(RejectedExecutionException expected) {
+            }
         }
         finally {
             release.countDown();

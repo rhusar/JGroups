@@ -15,7 +15,8 @@ import java.util.concurrent.ThreadPoolExecutor;
  * <p>
  * Some policies drop a rejected task <em>silently</em> (see {@link Util#discardsSilently(RejectedExecutionHandler)}),
  * ie. without raising a RejectedExecutionException. As callers such as {@link ThreadPool#execute(Runnable)} would
- * otherwise treat a dropped task as accepted, a {@link DiscardedException} is raised on the policy's behalf.
+ * otherwise treat a dropped task as accepted, a {@link DiscardedException} is raised on the policy's behalf. Callers
+ * which do want a task to be dropped silently (e.g. {@link ThreadPool#doExecute(Runnable)}) catch that exception.
  *
  * @author Vladimir Blagojevic
  * @see ThreadPoolExecutor
