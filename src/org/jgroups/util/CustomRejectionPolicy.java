@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class CustomRejectionPolicy implements RejectedExecutionHandler {
     public final static String NAME = "custom";
 
-    private final RejectedExecutionHandler custom;
+    protected final RejectedExecutionHandler custom; // the user-provided policy this one delegates to
 
     public CustomRejectionPolicy(String rejection_policy) {
         if (!rejection_policy.toLowerCase().startsWith("custom=")) {

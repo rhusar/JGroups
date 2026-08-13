@@ -18,7 +18,7 @@ public class ProgressCheckRejectionPolicy implements RejectedExecutionHandler {
     private long last_completed = -1;
     private long last_change = 0;
 
-    private RejectedExecutionHandler fallback = null;
+    protected RejectedExecutionHandler fallback = null; // without a fallback a rejected task is dropped
 
     public ProgressCheckRejectionPolicy(String rejection_policy) {
         String policy = rejection_policy.toLowerCase();

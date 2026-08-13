@@ -3906,6 +3906,35 @@ public class Util {
         throw new IllegalArgumentException("rejection policy \"" + rejection_policy + "\" not known");
     }
 
+    /**
+     * Unwraps decorating rejection policies and returns the handler which actually decides the fate of a rejected
+     * task. A {@link ProgressCheckRejectionPolicy} without a fallback is returned as-is: it is itself the handler
+     * which disposes of the task (by dropping it).
+     */
+    public static RejectedExecutionHandler unwrapRejectionPolicy(RejectedExecutionHandler h) {
+        if(h instanceof ShutdownRejectedExecutionHandler)
+            return unwrapRejectionPolicy(((ShutdownRejectedExecutionHandler)h).handler());
+        if(h instanceof CustomRejectionPolicy)
+            return unwrapRejectionPolicy(((CustomRejectionPolicy)h).custom);
+        if(h instanceof ProgressCheckRejectionPolicy) {
+            RejectedExecutionHandler fallback=((ProgressCheckRejectionPolicy)h).fallback;
+            return fallback != null? unwrapRejectionPolicy(fallback) : h;
+        }
+        return h;
+    }
+
+    /**
+     * Whether a rejection policy drops a task <em>silently</em>, ie. returns without running, queueing or rejecting
+     * it. A caller which needs to know whether a submitted task will ever run (e.g. {@link ThreadPool#execute(Runnable)})
+     * cannot tell such a drop from a successful submission, which is why {@link ShutdownRejectedExecutionHandler}
+     * raises a {@link RejectedExecutionException} on behalf of these policies.
+     */
+    public static boolean discardsSilently(RejectedExecutionHandler h) {
+        RejectedExecutionHandler p=unwrapRejectionPolicy(h);
+        // a progress check is only returned unwrapped if it has no fallback, in which case it drops the task
+        return p instanceof ThreadPoolExecutor.DiscardPolicy || p instanceof ProgressCheckRejectionPolicy;
+    }
+
 
     /** e.g. "A,B,C": List{"A", "B", "C"} */
     public static List<String> parseCommaDelimitedStrings(String l) {

@@ -13,9 +13,9 @@ import java.util.concurrent.ThreadPoolExecutor;
  * shutdown. ShutdownRejectedExecutionHandler instead logs only a warning
  * message.
  * <p>
- * A {@link ThreadPoolExecutor.DiscardPolicy} drops a rejected task <em>silently</em>, ie. without raising a
- * RejectedExecutionException. As callers such as {@link ThreadPool#execute(Runnable)} would otherwise treat a
- * discarded task as accepted, a {@link DiscardedException} is raised on the policy's behalf.
+ * Some policies drop a rejected task <em>silently</em> (see {@link Util#discardsSilently(RejectedExecutionHandler)}),
+ * ie. without raising a RejectedExecutionException. As callers such as {@link ThreadPool#execute(Runnable)} would
+ * otherwise treat a dropped task as accepted, a {@link DiscardedException} is raised on the policy's behalf.
  *
  * @author Vladimir Blagojevic
  * @see ThreadPoolExecutor
@@ -49,7 +49,7 @@ public class ShutdownRejectedExecutionHandler implements RejectedExecutionHandle
     public ShutdownRejectedExecutionHandler(RejectedExecutionHandler handler) {
         super();
         this.handler=Objects.requireNonNull(handler);
-        this.discards=handler instanceof ThreadPoolExecutor.DiscardPolicy;
+        this.discards=Util.discardsSilently(handler);
     }
 
     public RejectedExecutionHandler handler() {return handler;}
