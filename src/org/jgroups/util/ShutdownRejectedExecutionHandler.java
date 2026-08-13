@@ -15,16 +15,36 @@ import java.util.concurrent.ThreadPoolExecutor;
  * <p>
  * A {@link ThreadPoolExecutor.DiscardPolicy} drops a rejected task <em>silently</em>, ie. without raising a
  * RejectedExecutionException. As callers such as {@link ThreadPool#execute(Runnable)} would otherwise treat a
- * discarded task as accepted, a RejectedExecutionException is raised on the policy's behalf.
- * 
+ * discarded task as accepted, a {@link DiscardedException} is raised on the policy's behalf.
+ *
  * @author Vladimir Blagojevic
  * @see ThreadPoolExecutor
  * @see RejectedExecutionHandler
  */
 public class ShutdownRejectedExecutionHandler implements RejectedExecutionHandler {
 
-    RejectedExecutionHandler handler;
-    protected final boolean  discards; // true if the decorated handler drops tasks without raising an exception
+    /**
+     * Raised on behalf of a rejection policy which dropped a task without raising an exception. A discarding policy
+     * is picked to make an overloaded pool cheap, so this exception is shared and carries no stack trace: dropping a
+     * message must not become more expensive than delivering it.
+     */
+    public static class DiscardedException extends RejectedExecutionException {
+        private static final long serialVersionUID=6011936732638418694L;
+
+        protected DiscardedException() {
+            super("task was dropped by the rejection policy");
+        }
+
+        /** A shared exception cannot carry a meaningful stack trace anyway */
+        @Override
+        public Throwable fillInStackTrace() {return this;}
+    }
+
+    /** Raised whenever a task is dropped: it is stackless, so a per-task instance would carry no information */
+    protected static final DiscardedException DISCARDED=new DiscardedException();
+
+    protected final RejectedExecutionHandler handler;
+    protected final boolean                  discards; // true if the handler drops tasks without raising an exception
 
     public ShutdownRejectedExecutionHandler(RejectedExecutionHandler handler) {
         super();
@@ -38,7 +58,7 @@ public class ShutdownRejectedExecutionHandler implements RejectedExecutionHandle
         if(!executor.isShutdown()) {
             handler.rejectedExecution(r, executor);
             if(discards) // the task was dropped silently: tell the caller that it will never be run
-                throw new RejectedExecutionException(String.format("task %s was discarded", r));
+                throw DISCARDED;
         }
     }
 }
