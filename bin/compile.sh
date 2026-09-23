@@ -8,7 +8,7 @@ CONF=`dirname $0`/../conf
 CLASSPATH="$CLASSES:$LIB/*"
 
 OPTIONS="$OPTIONS --no-fallback"
-OPTIONS="$OPTIONS -Dgraal.CompilationFailureAction=Diagnose"
+OPTIONS="$OPTIONS -Djdk.graal.CompilationFailureAction=Diagnose"
 
 #OPTIONS="$OPTIONS --debug-attach=*:8000"
 
